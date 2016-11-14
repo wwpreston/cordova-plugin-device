@@ -18,6 +18,7 @@
 */
 package org.apache.cordova.device;
 
+import java.util.List;
 import java.util.TimeZone;
 
 import org.apache.cordova.CordovaWebView;
@@ -28,6 +29,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.hardware.Camera;
 import android.provider.Settings;
 
 public class Device extends CordovaPlugin {
@@ -76,6 +78,7 @@ public class Device extends CordovaPlugin {
             r.put("manufacturer", this.getManufacturer());
 	        r.put("isVirtual", this.isVirtual());
             r.put("serial", this.getSerialNumber());
+            r.put("cameraPreviewSizes", this.getCameraPreviewSizes());
             callbackContext.success(r);
         }
         else {
@@ -169,6 +172,26 @@ public class Device extends CordovaPlugin {
     public boolean isVirtual() {
 	return android.os.Build.FINGERPRINT.contains("generic") ||
 	    android.os.Build.PRODUCT.contains("sdk");
+    }
+
+    public String getCameraPreviewSizes() {
+        StringBuilder result = new StringBuilder();
+        Camera camera = Camera.open();
+        if (camera != null) {
+            Camera.Parameters parameters = camera.getParameters();
+            List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+            for (Camera.Size size : supportedPreviewSizes) {
+                result.append(size.width);
+                result.append('x');
+                result.append(size.height);
+                result.append(',');
+            }
+            camera.release();
+        }
+        if (result.length() > 1) {
+            result.deleteCharAt(result.length()-1);
+        }
+        return result.toString();
     }
 
 }
