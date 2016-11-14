@@ -44,6 +44,7 @@ function Device() {
     this.manufacturer = null;
     this.isVirtual = null;
     this.serial = null;
+    this.cameraPreviewSizes = null;
 
     var me = this;
 
@@ -61,6 +62,7 @@ function Device() {
             me.isVirtual = info.isVirtual;
             me.manufacturer = info.manufacturer || 'unknown';
             me.serial = info.serial || 'unknown';
+            me.cameraPreviewSizes = info.cameraPreviewSizes || '';
             channel.onCordovaInfoReady.fire();
         },function(e) {
             me.available = false;
