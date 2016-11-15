@@ -31,6 +31,9 @@ import org.json.JSONObject;
 
 import android.hardware.Camera;
 import android.provider.Settings;
+import android.util.Log;
+
+import uk.ac.horizon.artcodes.xmas.BuildConfig;
 
 public class Device extends CordovaPlugin {
     public static final String TAG = "Device";
@@ -79,6 +82,7 @@ public class Device extends CordovaPlugin {
 	        r.put("isVirtual", this.isVirtual());
             r.put("serial", this.getSerialNumber());
             r.put("cameraPreviewSizes", this.getCameraPreviewSizes());
+            r.put("appVersion", this.getAppVersion());
             callbackContext.success(r);
         }
         else {
@@ -175,23 +179,37 @@ public class Device extends CordovaPlugin {
     }
 
     public String getCameraPreviewSizes() {
-        StringBuilder result = new StringBuilder();
-        Camera camera = Camera.open();
-        if (camera != null) {
-            Camera.Parameters parameters = camera.getParameters();
-            List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
-            for (Camera.Size size : supportedPreviewSizes) {
-                result.append(size.width);
-                result.append('x');
-                result.append(size.height);
-                result.append(',');
+        try
+        {
+            StringBuilder result = new StringBuilder();
+            Camera camera = Camera.open();
+            if (camera != null)
+            {
+                Camera.Parameters parameters = camera.getParameters();
+                List<Camera.Size> supportedPreviewSizes = parameters.getSupportedPreviewSizes();
+                for (Camera.Size size : supportedPreviewSizes)
+                {
+                    result.append(size.width);
+                    result.append('x');
+                    result.append(size.height);
+                    result.append(',');
+                }
+                camera.release();
             }
-            camera.release();
+            if (result.length() > 1)
+            {
+                result.deleteCharAt(result.length() - 1);
+            }
+            Log.i("cordova_device", "Camera: " + result.toString());
+            return result.toString();
+        } catch (Exception e) {
+            Log.e("cordova_device", "Error getting camera preview sizes, permission may not have been granted.", e);
+            return "unknown";
         }
-        if (result.length() > 1) {
-            result.deleteCharAt(result.length()-1);
-        }
-        return result.toString();
+    }
+
+    public String getAppVersion() {
+        return BuildConfig.VERSION_NAME;
     }
 
 }
