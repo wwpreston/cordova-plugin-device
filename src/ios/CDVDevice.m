@@ -89,13 +89,18 @@
              @"version": [device systemVersion],
              @"uuid": [self uniqueAppInstanceIdentifier:device],
              @"cordova": [[self class] cordovaVersion],
-             @"isVirtual": @([self isVirtual])
-             };
+             @"isVirtual": @([self isVirtual]),
+             @"appVersion": [self appVersion]
+    };
 }
 
 + (NSString*)cordovaVersion
 {
-    return CDV_VERSION;
+	return CDV_VERSION;
+}
+- (NSString*)appVersion
+{
+	return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleShortVersionString" ];
 }
 
 - (BOOL)isVirtual
